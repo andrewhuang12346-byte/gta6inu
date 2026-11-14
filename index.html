@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GTA VI Inu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Bowlby+One&family=Comic+Neue:wght@700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout idea: a trailer, not a brochure. Inu's painted artwork carries every scene: sharp in front, the same frame blurred behind it for atmosphere. Thin wide capitals and glass cards sit on top. */
+  --black:#07070d;
+  --panel:rgba(255,255,255,.045);
+  --edge:rgba(255,255,255,.12);
+  --text:#f4eefc;
+  --dim:#b3abc9;
+  --pink:#ff4f9a;
+  --orange:#ff9a4d;
+  --violet:#8b5cff;
+  --teal:#3fe0d0;
+  --grad:linear-gradient(90deg,#ff4f9a,#ff9a4d);
+  --font-word:"Bowlby One","Impact","Arial Black",sans-serif;
+  --font-head:"Big Shoulders Display","Arial Narrow",Arial,sans-serif;
+  --font-body:"Outfit","Segoe UI",Helvetica,Arial,sans-serif;
+  --font-inu:"Comic Neue","Comic Sans MS","Chalkboard SE",cursive;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--black);color:var(--text);font-family:var(--font-body);font-weight:300;font-size:17px;line-height:1.65;overflow-x:hidden}
+svg,img{max-width:100%}
+a{color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{text-wrap:balance}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.eyebrow{font-weight:500;font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--dim)}
+.eyebrow b{color:var(--pink);font-weight:600}
+.title{font-family:var(--font-head);font-weight:800;text-transform:uppercase;font-size:clamp(40px,7vw,92px);line-height:.95;letter-spacing:.01em}
+.title em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.thin{font-family:var(--font-body);font-weight:300;text-transform:uppercase;letter-spacing:.3em;font-size:clamp(24px,4.6vw,54px);line-height:1.15}
+.inu-says{font-family:var(--font-inu);font-weight:700}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;text-decoration:none;font-family:var(--font-body);font-weight:600;font-size:12px;letter-spacing:.24em;text-transform:uppercase;padding:14px 26px;border-radius:999px;background:var(--grad);color:#1a0612;transition:transform .2s,box-shadow .2s}
+.pill:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,79,154,.4)}
+.pill.ghost{background:rgba(255,255,255,.08);color:var(--text);box-shadow:inset 0 0 0 1px var(--edge);backdrop-filter:blur(8px)}
+.pill.ghost:hover{background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+
+/* artwork layers: a pre-blurred copy fills the section, the sharp frame sits over it */
+.amb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.08)}
+.shade{position:absolute;inset:0;background:rgba(7,7,13,.7)}
+.grain{position:absolute;inset:0;opacity:.16;mix-blend-mode:overlay;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* drawn scenery, used only for cards that have no artwork of their own */
+.scene{position:absolute;inset:0;overflow:hidden;background:linear-gradient(180deg,var(--sk1) 0%,var(--sk2) 30%,var(--sk3) 54%,var(--sk4) 68%,#07070d 68%)}
+.g-sunset{--sk1:#0d0828;--sk2:#4c1a66;--sk3:#d8437a;--sk4:#ff9a4d;--sun:rgba(255,196,110,.95);--tint:rgba(255,130,90,.34)}
+.g-night{--sk1:#05040d;--sk2:#150a30;--sk3:#3a1458;--sk4:#8a2372;--sun:rgba(255,79,154,.6);--tint:rgba(255,79,154,.26)}
+.g-teal{--sk1:#03070f;--sk2:#0a2434;--sk3:#12566a;--sk4:#35b9b0;--sun:rgba(170,255,240,.6);--tint:rgba(63,224,208,.24)}
+.g-gold{--sk1:#170a1c;--sk2:#742a40;--sk3:#f07a3a;--sk4:#ffd88a;--sun:rgba(255,236,170,.98);--tint:rgba(255,200,100,.34)}
+.sc-sun{position:absolute;left:50%;top:68%;width:min(70vw,720px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,var(--sun) 0 22%,transparent 62%);filter:blur(6px)}
+.sc-far{position:absolute;left:0;bottom:32%;width:100%;height:34%;color:#0d0a1f;filter:blur(1.2px);opacity:.96}
+.sc-palm{position:absolute;bottom:31%;width:auto;color:#06050c;transform:translateX(-50%)}
+.sc-sign{position:absolute;bottom:35%;font-family:var(--font-head);font-weight:800;font-size:clamp(13px,1.8vw,24px);letter-spacing:.14em;color:#fff;padding:2px 10px;border:2px solid var(--c);border-radius:6px;text-shadow:0 0 6px var(--c),0 0 18px var(--c);box-shadow:0 0 14px var(--c),inset 0 0 10px var(--c);transform:translateX(-50%)}
+.sc-ground{position:absolute;left:0;right:0;bottom:0;height:32%;background:linear-gradient(180deg,#0c0a16,#050509)}
+.sc-ground::before{content:"";position:absolute;left:10%;right:10%;top:0;height:100%;background:radial-gradient(ellipse at 50% 0,var(--tint),transparent 70%);filter:blur(10px)}
+.sc-vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,transparent 38%,rgba(4,3,10,.82) 100%)}
+
+/* announce + nav */
+.announce{display:block;text-align:center;text-decoration:none;font-weight:500;font-size:11px;letter-spacing:.3em;text-transform:uppercase;padding:9px 16px;background:#12101f;border-bottom:1px solid var(--edge);color:var(--text)}
+.announce:hover{color:var(--orange)}
+.nav{position:sticky;top:0;z-index:30;background:rgba(7,7,13,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--edge)}
+.nav .wrap{display:flex;align-items:center;gap:22px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--font-head);font-weight:800;font-size:22px;letter-spacing:.12em;white-space:nowrap}
+.brand i{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand .av{width:38px;height:38px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 2px var(--violet);flex:none}
+.brand .av img{width:100%;height:100%;object-fit:cover;display:block}
+.nav ul{display:flex;gap:22px;list-style:none;margin:0 0 0 12px;padding:0}
+.nav ul a{font-family:var(--font-head);font-weight:700;font-size:15px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--dim);white-space:nowrap}
+.nav ul a:hover{color:#fff}
+.nav .pill{margin-left:auto;padding:10px 18px;font-size:11px;white-space:nowrap}
+@media (max-width:980px){.nav ul{display:none}}
+
+/* loader */
+.loader{position:fixed;inset:0;z-index:60;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:20px;animation:out .6s ease 1.7s forwards}
+.loader img{width:120px;height:120px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px var(--violet),0 0 40px rgba(255,79,154,.5)}
+.loader .pct{font-family:var(--font-head);font-weight:800;font-size:54px;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.loader small{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+@keyframes out{to{opacity:0;visibility:hidden;pointer-events:none}}
+
+/* hero */
+.hero{position:relative;overflow:hidden;min-height:clamp(700px,48vw,900px);display:flex;align-items:center;padding:64px 0}
+.hero-art{position:absolute;right:0;top:0;bottom:0;width:min(70vw,1100px);-webkit-mask-image:linear-gradient(90deg,transparent 4%,#000 52%);mask-image:linear-gradient(90deg,transparent 4%,#000 52%)}
+.hero-art img{display:block;width:100%;height:100%;object-fit:cover;object-position:100% 30%}
+.hero .shade{background:linear-gradient(90deg,rgba(7,7,13,.88) 0%,rgba(7,7,13,.55) 38%,rgba(7,7,13,0) 62%),linear-gradient(180deg,rgba(7,7,13,.4) 0%,rgba(7,7,13,0) 18%,rgba(7,7,13,0) 74%,rgba(7,7,13,.9) 100%)}
+.hero .wrap{position:relative;z-index:2;width:100%}
+.hero-in{display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;width:min(100%,clamp(420px,44vw,560px))}
+.word{position:relative;font-family:var(--font-word);font-size:clamp(88px,15vw,190px);line-height:.8;letter-spacing:.02em;background:linear-gradient(180deg,#8b5cff 0%,#ff4f9a 48%,#ff9a4d 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:3px rgba(255,255,255,.92);filter:drop-shadow(0 0 28px rgba(255,79,154,.55)) drop-shadow(0 8px 0 rgba(0,0,0,.5))}
+.word small{display:block;font-family:var(--font-body);font-weight:500;font-size:clamp(14px,1.9vw,22px);line-height:1;letter-spacing:.5em;text-indent:.5em;text-transform:uppercase;margin-bottom:18px;color:#fff;-webkit-text-fill-color:#fff;-webkit-text-stroke:0;background:none}
+.hero .sub{font-size:18px;font-weight:400;max-width:32ch}
+.hero .sub b{color:var(--teal);font-weight:500}
+.coming{display:flex;flex-direction:column;gap:2px;margin-top:4px}
+.coming .date{font-weight:400;letter-spacing:.2em;text-transform:uppercase;font-size:clamp(20px,2.6vw,32px);line-height:1.25}
+.coming em{font-style:italic;color:var(--dim)}
+.cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.plats{display:flex;gap:8px 22px;flex-wrap:wrap;justify-content:center;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+.ticker{max-width:100%;font-size:11px;letter-spacing:.18em;text-transform:uppercase;background:rgba(7,7,13,.7);border:1px solid var(--edge);border-radius:999px;padding:9px 18px;backdrop-filter:blur(8px)}
+.ticker::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#54e38e;box-shadow:0 0 10px #54e38e;margin-right:10px}
+.ticker b{font-weight:600;font-variant-numeric:tabular-nums}
+@media (max-width:900px){
+  .hero{flex-direction:column;align-items:stretch;min-height:0;padding:0 0 54px}
+  .hero-art{position:relative;right:auto;top:auto;bottom:auto;width:100%;aspect-ratio:620/488;-webkit-mask-image:linear-gradient(180deg,#000 62%,transparent);mask-image:linear-gradient(180deg,#000 62%,transparent)}
+  .hero .shade{background:linear-gradient(180deg,rgba(7,7,13,0) 0,rgba(7,7,13,0) 22%,rgba(7,7,13,.84) 42%,rgba(7,7,13,.94) 100%)}
+  .hero-in{width:100%;margin-top:-56px}
+}
+
+/* event band */
+.band{position:relative;overflow:hidden;min-height:820px;display:flex;align-items:flex-end;justify-content:center;text-align:center;padding:80px 22px 56px}
+.band-art{position:absolute;left:50%;top:0;height:calc(100% - 170px);aspect-ratio:620/520;transform:translateX(-50%);-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.band-art img{display:block;width:100%;height:100%;object-fit:cover}
+.band .shade{background:linear-gradient(180deg,rgba(7,7,13,.45) 0,rgba(7,7,13,0) 16%,rgba(7,7,13,0) 56%,rgba(7,7,13,.95) 80%),linear-gradient(90deg,rgba(7,7,13,.9) 0,rgba(7,7,13,.55) 16%,rgba(7,7,13,0) 30%,rgba(7,7,13,0) 70%,rgba(7,7,13,.55) 84%,rgba(7,7,13,.9) 100%)}
+.band-in{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px}
+.meta{display:flex;gap:16px;align-items:center;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--dim)}
+.meta span+span{border-left:1px solid var(--edge);padding-left:16px}
+@media (max-width:760px){
+  .band{flex-direction:column;align-items:center;min-height:0;padding:0 22px 56px}
+  .band-art{position:relative;left:auto;top:auto;transform:none;height:auto;width:calc(100% + 44px);margin:0 -22px;-webkit-mask-image:linear-gradient(180deg,#000 70%,transparent);mask-image:linear-gradient(180deg,#000 70%,transparent)}
+  .band .shade{background:linear-gradient(180deg,rgba(7,7,13,0) 0,rgba(7,7,13,0) 40%,rgba(7,7,13,.9) 66%)}
+  .band-in{margin-top:-30px}
+}
+
+/* editions */
+.editions{padding:90px 0}
+.two{display:grid;grid-template-columns:1fr 1.25fr;gap:22px}
+.gcard{position:relative;overflow:hidden;border-radius:22px;border:1px solid var(--edge);background:linear-gradient(160deg,rgba(139,92,255,.22),rgba(255,79,154,.08) 60%,rgba(255,255,255,.03));padding:34px;display:flex;flex-direction:column;gap:14px;min-height:400px}
+.gcard h3{font-family:var(--font-head);font-weight:800;text-transform:uppercase;font-size:clamp(34px,4.4vw,56px);line-height:.95}
+.gcard p{color:var(--dim);max-width:44ch}
+.gcard ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;color:var(--text)}
+.gcard li::before{content:"+";color:var(--pink);font-weight:600;margin-right:10px}
+.gcard .box{position:absolute;right:26px;bottom:26px;width:150px;aspect-ratio:3/4;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,.85);transform:rotate(5deg);box-shadow:0 18px 40px rgba(0,0,0,.6)}
+.gcard .box img{display:block;width:100%;height:100%;object-fit:cover;object-position:66% 40%}
+.gcard.wide{background:#000;padding:0}
+.gcard.wide .fill{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:40% 6%}
+.gcard.wide .shade{background:linear-gradient(180deg,rgba(7,7,13,0) 24%,rgba(7,7,13,.8) 58%,rgba(7,7,13,.96) 84%)}
+.gcard.wide .txt{position:relative;z-index:2;margin-top:auto;padding:34px;display:flex;flex-direction:column;gap:12px}
+.gcard.wide p{color:var(--text)}.gcard.wide .eyebrow{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.9)}
+.gcard:not(.wide)>p,.gcard:not(.wide)>ul{max-width:calc(100% - 170px)}
+@media (max-width:860px){.two{grid-template-columns:1fr}.gcard .box{position:relative;right:auto;bottom:auto;align-self:flex-end}.gcard:not(.wide)>p,.gcard:not(.wide)>ul{max-width:none}}
+
+/* story */
+.story{position:relative;overflow:hidden;padding:150px 22px;text-align:center}
+.story .shade{background:linear-gradient(180deg,rgba(7,7,13,.92),rgba(7,7,13,.66) 50%,rgba(7,7,13,.95))}
+.story-in{position:relative;z-index:2;max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:22px;align-items:center}
+.story p{font-size:19px;font-weight:400}
+.story p.kick{font-style:italic;color:var(--dim);font-weight:300}
+
+/* the walk */
+.walk{position:relative;height:2400px}
+.stage{position:sticky;top:64px;height:min(680px,calc(100vh - 64px));min-height:560px;overflow:hidden;display:flex;align-items:center}
+.stage .amb{opacity:0;transition:opacity .7s}
+.stage .amb.on{opacity:1}
+.stage .shade{background:rgba(7,7,13,.66)}
+.stage-in{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);grid-template-areas:"frame head" "frame body";column-gap:clamp(22px,4vw,56px);row-gap:18px;align-items:start}
+.frame{grid-area:frame;align-self:center;position:relative;width:100%;aspect-ratio:5/4;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.3);box-shadow:0 30px 80px rgba(0,0,0,.6);background:#000}
+.frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
+.frame img.on{opacity:1}
+.frame .cap{position:absolute;left:0;right:0;bottom:0;padding:44px 22px 16px;font-size:clamp(24px,3.4vw,44px);line-height:1;color:#fff;text-align:left;text-shadow:0 2px 0 #000,0 0 14px rgba(0,0,0,.85);background:linear-gradient(180deg,transparent,rgba(7,7,13,.78))}
+.tell-head{grid-area:head;align-self:end;display:flex;flex-direction:column;gap:10px}
+.tell-head .title{font-size:clamp(34px,4.6vw,64px)}
+.tell-body{grid-area:body;display:flex;flex-direction:column;gap:14px}
+.tell-body .when{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--orange);font-weight:500}
+.tell-body .what{font-size:18px;font-weight:400;min-height:3.3em}
+.meter{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.meter div{background:rgba(7,7,13,.66);border:1px solid var(--edge);border-radius:14px;padding:10px 12px;backdrop-filter:blur(8px)}
+.meter b{display:block;font-family:var(--font-head);font-weight:800;font-size:clamp(20px,2.2vw,28px);line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.meter span{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);line-height:1.4;margin-top:2px}
+.ctl{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.dots{display:flex;gap:8px}
+.dots i{width:30px;height:4px;border-radius:2px;background:rgba(255,255,255,.22);transition:background .3s}
+.dots i.on{background:var(--pink)}
+@media (max-width:860px){
+  .stage-in{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "frame" "body";row-gap:12px}
+  .frame{max-width:440px;justify-self:center}
+  .tell-head{align-self:start;text-align:center;align-items:center}
+  .tell-body .what{display:none}
+  .tell-body{gap:10px}
+  .tell-body .when{text-align:center}
+}
+
+.tagline{padding:130px 22px;text-align:center;background:radial-gradient(ellipse at 50% 100%,rgba(255,79,154,.2),transparent 60%)}
+.tagline small{display:block;margin-top:18px;font-size:20px;color:var(--orange)}
+
+/* cast + places */
+.sec{padding:100px 0}
+.sec-head{display:flex;flex-direction:column;gap:12px;margin-bottom:44px}
+.sec-head .title{font-size:clamp(38px,6vw,76px)}
+.sec-head p{color:var(--dim);max-width:60ch}
+.cast{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.person{position:relative;aspect-ratio:3/4.3;border-radius:20px;overflow:hidden;border:1px solid var(--edge);display:flex;flex-direction:column;justify-content:flex-end;background:#000}
+.person .shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:30% 0}
+.person .prop{position:absolute;left:50%;transform:translateX(-50%);bottom:36%;width:64%;filter:drop-shadow(0 0 22px var(--tint)) brightness(.9)}
+.person .cap{position:relative;z-index:2;padding:22px;background:linear-gradient(180deg,transparent,rgba(7,7,13,.94) 42%)}
+.person .cap span{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--pink);font-weight:500}
+.person h3{font-family:var(--font-head);font-weight:800;text-transform:uppercase;font-size:34px;line-height:1}
+.person p{font-size:15px;color:var(--dim);margin-top:6px;line-height:1.45}
+@media (max-width:1000px){.cast{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:500px){.cast{grid-template-columns:1fr}}
+.places{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
+.spot{position:relative;min-height:300px;border-radius:20px;overflow:hidden;border:1px solid var(--edge);display:flex;flex-direction:column;justify-content:flex-end;padding:24px;grid-column:span 2}
+.spot.big{grid-column:span 3;min-height:360px}
+.spot .shade{background:linear-gradient(180deg,rgba(7,7,13,.3),rgba(7,7,13,.2) 40%,rgba(7,7,13,.92))}
+.spot>*:not(.scene):not(.shade){position:relative;z-index:2}
+.spot i{font-style:normal;font-size:11px;letter-spacing:.3em;color:var(--teal);font-weight:500}
+.spot h3{font-family:var(--font-head);font-weight:800;text-transform:uppercase;font-size:clamp(28px,3.2vw,42px);line-height:1}
+.spot p{font-size:15px;font-weight:400;max-width:38ch;margin-top:4px}
+@media (max-width:900px){.spot,.spot.big{grid-column:span 6;min-height:240px}}
+
+/* rap sheet */
+.sheet{display:grid;grid-template-columns:330px 1fr;gap:clamp(22px,4vw,54px);border-radius:22px;border:1px solid var(--edge);background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.02));padding:clamp(22px,4vw,46px)}
+.mug{position:relative;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:#111}
+.mug img{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(.92) contrast(1.15)}
+.mug::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(180deg,transparent 0 46px,rgba(255,255,255,.2) 46px 48px)}
+.mug .plate{position:absolute;z-index:2;left:50%;bottom:12px;transform:translateX(-50%);background:#0b0b12;color:#fff;font-family:var(--font-head);font-weight:700;letter-spacing:.14em;font-size:14px;padding:4px 12px;white-space:nowrap}
+.mugnote{font-size:13px;color:var(--dim);margin-top:12px;font-style:italic}
+.sheet .dept{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--edge);padding-bottom:12px}
+.sheet h2{font-family:var(--font-head);font-weight:800;text-transform:uppercase;font-size:clamp(60px,10vw,130px);line-height:.9;margin:14px 0 4px;background:linear-gradient(180deg,#ff5a5a,#ff4f9a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sheet dl{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:18px 0 22px}
+.sheet dt,.sheet .lbl{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+.sheet dd{margin:2px 0 0;font-weight:400;font-size:17px}
+.sheet ol{margin:10px 0 0;padding-left:22px;columns:2;column-gap:32px}
+.sheet li{break-inside:avoid;margin-bottom:6px;font-weight:400}
+.sheet li::marker{color:var(--pink);font-weight:600}
+.bounty{margin-top:22px;border:1px dashed var(--pink);border-radius:12px;padding:12px 16px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange)}
+@media (max-width:860px){.sheet{grid-template-columns:1fr}.mug{max-width:320px}.sheet ol{columns:1}.sheet dl{grid-template-columns:repeat(2,1fr)}}
+
+/* media */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.tile{position:relative;margin:0;aspect-ratio:1;border-radius:16px;overflow:hidden;border:1px solid var(--edge);background:#000}
+.tile img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.tile:hover img{transform:scale(1.05)}
+.tile figcaption{position:absolute;z-index:2;left:0;right:0;bottom:0;padding:26px 16px 14px;display:flex;justify-content:space-between;gap:10px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:500;background:linear-gradient(180deg,transparent,rgba(7,7,13,.92))}
+.tile figcaption span{color:rgba(255,255,255,.82);font-weight:300}
+@media (max-width:860px){.tiles{grid-template-columns:repeat(2,1fr)}}
+
+/* news */
+.news{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.post{border-radius:18px;border:1px solid var(--edge);background:var(--panel);padding:24px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s,transform .2s}
+.post:hover{border-color:rgba(255,79,154,.6);transform:translateY(-3px)}
+.post time{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--orange);font-weight:500}
+.post h3{font-family:var(--font-head);font-weight:800;text-transform:uppercase;font-size:27px;line-height:1.02}
+.post p{color:var(--dim);font-size:15px}
+@media (max-width:1000px){.news{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:500px){.news{grid-template-columns:1fr}}
+
+/* newsletter */
+.bork{position:relative;overflow:hidden;padding:130px 22px;text-align:center}
+.bork .shade{background:rgba(7,7,13,.74)}
+.bork-in{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:16px}
+.bork form{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.bork input{font:inherit;font-weight:400;padding:13px 20px;border-radius:999px;border:1px solid var(--edge);background:rgba(7,7,13,.7);color:var(--text);width:min(340px,100%)}
+.bork .note{min-height:28px;font-size:19px;color:var(--orange)}
+.bork .fine{font-size:13px;color:var(--dim)}
+
+footer{border-top:1px solid var(--edge);padding:44px 0 60px;color:var(--dim);font-size:13px}
+footer .wrap{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start}
+.rating{width:86px;border:2px solid #fff;color:#fff;text-align:center;padding:6px 4px 8px;border-radius:4px}
+.rating b{display:block;font-family:var(--font-head);font-weight:800;font-size:54px;line-height:1}
+.rating span{font-size:9px;letter-spacing:.2em;text-transform:uppercase}
+footer ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px 24px;margin:0 0 14px;padding:0}
+footer ul a{text-decoration:none;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--text)}
+footer ul a:hover{color:var(--pink)}
+footer p{max-width:72ch}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .loader{display:none}
+  .pill,.post,.tile img,.frame img,.stage .amb,.dots i{transition:none}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="skyline" viewBox="0 0 1200 200">
+      <path fill="currentColor" d="M0 200V120h60V70h46v60h50V30h54v110h40V90h70v50h44V10h50v120h60V60h48v80h56V100h66v40h40V40h52v100h46V80h62v60h50V20h48v120h60V96h58v104z"/>
+      <g fill="#3fe0d0" opacity=".85"><rect x="166" y="44" width="5" height="7"/><rect x="186" y="72" width="5" height="7"/><rect x="374" y="24" width="5" height="7"/><rect x="394" y="58" width="5" height="7"/><rect x="374" y="92" width="5" height="7"/><rect x="680" y="56" width="5" height="7"/><rect x="700" y="90" width="5" height="7"/><rect x="938" y="36" width="5" height="7"/><rect x="958" y="70" width="5" height="7"/><rect x="1062" y="112" width="5" height="7"/></g>
+      <g fill="#ff4f9a" opacity=".85"><rect x="74" y="88" width="5" height="7"/><rect x="264" y="108" width="5" height="7"/><rect x="494" y="76" width="5" height="7"/><rect x="560" y="116" width="5" height="7"/><rect x="786" y="96" width="5" height="7"/><rect x="884" y="120" width="5" height="7"/><rect x="1130" y="112" width="5" height="7"/></g>
+    </symbol>
+    <symbol id="palm" viewBox="0 0 200 300">
+      <g fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M92 300 Q96 190 106 78" stroke-width="7"/>
+        <path d="M106 78 Q64 44 16 74" stroke-width="7"/><path d="M106 78 Q70 20 26 22" stroke-width="7"/><path d="M106 78 Q108 22 142 6" stroke-width="7"/><path d="M106 78 Q150 40 190 62" stroke-width="7"/><path d="M106 78 Q150 76 176 116" stroke-width="7"/><path d="M106 78 Q70 84 44 124" stroke-width="7"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="loader" aria-hidden="true">
+  <img src="img/face.jpg" width="440" height="440" alt="">
+  <div class="pct" id="pct">0%</div>
+  <small id="loadmsg">Waiting for him to stand up</small>
+</div>
+
+<a class="announce" href="#extended-sit">An extended sit, coming whenever &nbsp;→</a>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="av"><img src="img/face.jpg" width="440" height="440" alt=""></span>GTA VI <i>INU</i></a>
+    <ul>
+      <li><a href="#story">Story</a></li>
+      <li><a href="#walk">The walk</a></li>
+      <li><a href="#cast">People &amp; places</a></li>
+      <li><a href="#rap-sheet">Rap sheet</a></li>
+      <li><a href="#media">Media</a></li>
+      <li><a href="#newswire">Newswire</a></li>
+    </ul>
+    <a class="pill" href="#bork-report">Pre-bork now</a>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero" aria-label="The GTA VI Inu">
+  <img class="amb" src="img/escape-bg.jpg" alt="" aria-hidden="true">
+  <div class="hero-art"><img src="img/escape.jpg" width="1240" height="976" alt="Inu, a golden shiba inu in a teal hibiscus shirt and gold chain, rides a pink scooter away from two police cars and gives a side-eye."></div>
+  <div class="shade"></div>
+  <div class="grain"></div>
+  <div class="wrap">
+    <div class="hero-in">
+      <h1 class="word" aria-label="The GTA VI Inu"><small>The GTA VI</small>INU</h1>
+      <p class="sub">The dog from the most anticipated game ever <b>will do anything except walk.</b></p>
+      <div class="coming">
+        <span class="eyebrow">Coming</span>
+        <span class="date">When he feels like it</span>
+        <em>He has already left the scene.</em>
+      </div>
+      <div class="cta">
+        <a class="pill" href="#bork-report">Pre-bork now</a>
+        <a class="pill ghost" href="#walk">Watch him not walk</a>
+        <a class="pill ghost" href="#rap-sheet">Rap sheet</a>
+      </div>
+      <div class="plats"><span>Convertible</span><span>Scooter</span><span>Jet ski</span><span>Never on foot</span></div>
+      <div class="ticker">Walk-free since Jan 1, 2024 — <b id="days">0</b> days, <b>0</b> steps</div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="extended-sit" aria-label="An extended sit">
+  <img class="amb" src="img/lounge-bg.jpg" alt="" aria-hidden="true">
+  <div class="band-art"><img src="img/lounge.jpg" width="1240" height="1040" alt="Inu in sunglasses, lying back on a pink striped beach chair with a coconut drink while a pink sports car burns on the sand behind him."></div>
+  <div class="shade"></div>
+  <div class="grain"></div>
+  <div class="band-in">
+    <span class="eyebrow">Only on the beach</span>
+    <h2 class="thin">An extended sit</h2>
+    <div class="meta"><span style="color:var(--pink)">Inu</span><span>No date</span><span>No rush</span></div>
+    <a class="pill ghost" href="#bork-report">Remind me</a>
+  </div>
+</section>
+
+<section class="editions">
+  <div class="wrap two">
+    <article class="gcard">
+      <span class="eyebrow">Ultimate edition</span>
+      <h3>Ultimate<br>Loaf<br>Edition</h3>
+      <p>Everything in the standard edition, which is one dog, plus the following.</p>
+      <ul><li>One beach chair, occupied</li><li>One hibiscus shirt, unbuttoned</li><li>One leash, never used</li></ul>
+      <div class="box"><img src="img/drift.jpg" width="1244" height="976" alt="Cover art: Inu at the wheel of a pink convertible."></div>
+    </article>
+    <article class="gcard wide">
+      <img class="fill" src="img/speed.jpg" width="1244" height="1020" alt="Inu, tongue out, riding a pink jet ski through a wave at sunset.">
+      <div class="shade"></div>
+      <div class="txt">
+        <span class="eyebrow">Pre-bork bonuses</span>
+        <h3>The Pink Fleet Pack</h3>
+        <p>Pre-bork to unlock one convertible, one scooter and one jet ski. All pink. None of them his.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="story" id="story">
+  <img class="amb" src="img/drift-bg.jpg" alt="" aria-hidden="true">
+  <div class="shade"></div>
+  <div class="grain"></div>
+  <div class="story-in">
+    <span class="eyebrow">State of Denial</span>
+    <h2 class="title">Borka Beach, USA.</h2>
+    <p>It was supposed to be one easy walk. Around the block, ten minutes, home. Four steps from the front door, Inu sat down. Eleven minutes later a pink convertible was missing, two patrol cars were chasing a scooter up the boulevard, and somebody's jet ski was heading out to sea. He has covered most of the city since. He has not walked any of it.</p>
+    <p class="kick">The leash is still on its hook.</p>
+  </div>
+</section>
+
+<section class="walk" id="walk" aria-label="The walk">
+  <div class="stage" id="stage">
+    <img class="amb on" src="img/drift-bg.jpg" alt="" aria-hidden="true">
+    <img class="amb" src="img/escape-bg.jpg" alt="" aria-hidden="true">
+    <img class="amb" src="img/speed-bg.jpg" alt="" aria-hidden="true">
+    <img class="amb" src="img/lounge-bg.jpg" alt="" aria-hidden="true">
+    <div class="shade"></div>
+    <div class="grain"></div>
+    <div class="wrap">
+      <div class="stage-in">
+        <div class="tell-head">
+          <span class="eyebrow">Open world. <b>Closed mind.</b></span>
+          <h2 class="title">He does <em>not</em> walk it.</h2>
+        </div>
+        <div class="frame">
+          <img class="on" src="img/drift.jpg" width="1244" height="976" alt="Inu, wide-eyed, drifting a pink convertible through tyre smoke past neon hotels.">
+          <img src="img/escape.jpg" width="1240" height="976" alt="Inu riding a pink scooter away from two police cars, giving a side-eye.">
+          <img src="img/speed.jpg" width="1244" height="1020" alt="Inu, tongue out, riding a pink jet ski through a wave at sunset.">
+          <img src="img/lounge.jpg" width="1240" height="1040" alt="Inu in sunglasses on a beach chair with a coconut drink while a pink sports car burns behind him.">
+          <span class="cap inu-says" id="cap">much drift</span>
+        </div>
+        <div class="tell-body">
+          <p class="when" id="when">00:11 after "walkies"</p>
+          <p class="what" id="what">The Human reached for the leash. Inu reached for a convertible that was not his.</p>
+          <div class="meter">
+            <div><b id="effort">0 px</b><span>Your scroll effort</span></div>
+            <div><b>0.0 m</b><span>Distance walked</span></div>
+            <div><b id="km">0.0 km</b><span>By borrowed vehicle</span></div>
+          </div>
+          <div class="ctl">
+            <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+            <button class="pill" id="next" type="button">Next scene</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tagline" aria-label="Tagline">
+  <h2 class="thin">Go anywhere. Never on foot.</h2>
+  <small class="inu-says">such freedom. very wheels.</small>
+</section>
+
+<section class="sec" id="cast">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow"><b>People</b> &amp; places</span><h2 class="title">One dog. Three problems.</h2></div>
+    <div class="cast">
+      <article class="person"><img class="shot" src="img/portrait.jpg" width="726" height="1040" alt="Inu in sunglasses, hibiscus shirt and gold chain.">
+        <div class="cap"><span>Protagonist, technically</span><h3>Inu</h3><p>Shiba. Hibiscus shirt, gold chain. Will drive, ride and float. Will not walk.</p></div></article>
+      <article class="person"><img class="shot" src="img/human.jpg" alt="A man in sunglasses, a hibiscus shirt and a gold chain, hands in his pockets on a neon seafront at sunset." style="object-position:50% 0">
+        <div class="cap"><span>Leash holder</span><h3>The Human</h3><p>Pays the rent. Carries the bags. Has never once won an argument with the dog.</p></div></article>
+      <article class="person"><img class="shot" src="img/mail.jpg" alt="A smiling mail carrier in a blue uniform and cap, holding letters, with a satchel and a mail truck behind him." style="object-position:50% 0">
+        <div class="cap"><span>Nemesis</span><h3>The Mail Carrier</h3><p>Arrives at 11:40 every day. Is screamed at at 11:40 every day. Still waves.</p></div></article>
+      <article class="person"><img class="shot" src="img/chicken.jpg" alt="A giant rotisserie chicken in aviator sunglasses and a gold chain, standing hands on hips on a neon street." style="object-position:50% 0">
+        <div class="cap"><span>The score</span><h3>The Chicken</h3><p>Rotisserie. Unguarded for ninety seconds. The only thing he has ever run toward.</p></div></article>
+    </div>
+
+    <div class="sec-head" style="margin-top:90px"><span class="eyebrow">People &amp; <b>places</b></span><h2 class="title">A huge map. None of it walked.</h2></div>
+    <div class="places">
+      <article class="spot big"><div class="scene g-gold" data-palms="8,60;20,44"></div><div class="shade"></div><i>01</i><h3>The Front Step</h3><p>Four steps from the door. Where every walk ends.</p></article>
+      <article class="spot big"><div class="scene g-sunset" data-palms="70,48;84,62;94,50" data-signs="HOTEL,26,#ff4f9a"></div><div class="shade"></div><i>02</i><h3>Hibiscus Drive</h3><p>Neon hotels, palm trees and fresh tyre marks.</p></article>
+      <article class="spot"><div class="scene g-night" data-signs="POLICE,50,#3fe0d0"></div><div class="shade"></div><i>03</i><h3>The Causeway</h3><p>Two patrol cars long. One scooter wide.</p></article>
+      <article class="spot"><div class="scene g-teal" data-palms="90,40"></div><div class="shade"></div><i>04</i><h3>Borka Bay</h3><p>Jet skis rent by the hour. He did not rent it.</p></article>
+      <article class="spot"><div class="scene g-sunset" data-palms="12,52;88,58"></div><div class="shade"></div><i>05</i><h3>The Beach Chair</h3><p>Final destination. Excellent view of the fire.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="rap-sheet" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sheet">
+      <div>
+        <div class="mug">
+          <img src="img/bust.jpg" width="640" height="854" alt="Booking photo of Inu, taken on the street, giving the camera a side-eye.">
+          <span class="plate">BBPD · 000006 · INU</span>
+        </div>
+        <p class="mugnote">Photographed at the scene. He declined to walk to the station.</p>
+      </div>
+      <div>
+        <div class="dept"><span>Borka Beach Police Dept.</span><span>Booking record</span></div>
+        <h2>Wanted</h2>
+        <dl>
+          <div><dt>Name</dt><dd>Inu</dd></div>
+          <div><dt>Aliases</dt><dd>"Sir", "Excuse me", "Come ON"</dd></div>
+          <div><dt>Height</dt><dd>Low</dd></div>
+          <div><dt>Confirmed walks</dt><dd>0</dd></div>
+          <div><dt>Last seen wearing</dt><dd>Hibiscus shirt, gold chain</dd></div>
+          <div><dt>Status</dt><dd>At large, on a beach chair</dd></div>
+        </dl>
+        <span class="lbl">Charges</span>
+        <ol>
+          <li>Resisting a walk (1,204 counts)</li>
+          <li>Taking one (1) pink convertible without asking</li>
+          <li>Evading two patrol cars on a scooter</li>
+          <li>Operating a jet ski without thumbs</li>
+          <li>Theft of one (1) rotisserie chicken</li>
+          <li>Unlawful side-eye of an officer</li>
+          <li>Sitting near a car fire and not caring</li>
+        </ol>
+        <div class="bounty">Bounty: one rotisserie chicken (already stolen)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="media">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Media &amp; <b>artwork</b></span><h2 class="title">Four moods. One shirt.</h2></div>
+    <div class="tiles">
+      <figure class="tile"><img src="img/face-drift.jpg" width="420" height="420" alt="Inu's face, wide-eyed and mouth open."><figcaption>Alarm <span>Much drift</span></figcaption></figure>
+      <figure class="tile"><img src="img/face.jpg" width="440" height="440" alt="Inu's face, giving a side-eye."><figcaption>Contempt <span>Very escape</span></figcaption></figure>
+      <figure class="tile"><img src="img/face-speed.jpg" width="440" height="440" alt="Inu's face, tongue out and delighted."><figcaption>Joy <span>Such speed</span></figcaption></figure>
+      <figure class="tile"><img src="img/face-lounge.jpg" width="440" height="440" alt="Inu's face in sunglasses, completely calm."><figcaption>Peace <span>Mission passed</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="newswire" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Featured <b>news</b></span><h2 class="title">Newswire</h2></div>
+    <div class="news">
+      <article class="post"><time datetime="2026-11-12">Nov 12, 2026</time><h3>Release window moved to "later"</h3><p>The team asked Inu to stand for the cover shoot. The team is still asking.</p></article>
+      <article class="post"><time datetime="2026-11-05">Nov 5, 2026</time><h3>Pink convertible reported missing</h3><p>The owner describes the suspect as small, orange and very calm.</p></article>
+      <article class="post"><time datetime="2026-10-28">Oct 28, 2026</time><h3>Trailer 2 is one shot of him sitting</h3><p>Four minutes. No cuts. Critics are calling it "a dog" and "long".</p></article>
+      <article class="post"><time datetime="2026-10-14">Oct 14, 2026</time><h3>Walking removed from the game</h3><p>Playtesters could not get him to do it either.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="bork" id="bork-report">
+  <img class="amb" src="img/speed-bg.jpg" alt="" aria-hidden="true">
+  <div class="shade"></div>
+  <div class="grain"></div>
+  <div class="bork-in">
+    <span class="eyebrow">Pre-bork</span>
+    <h2 class="thin">Get the Bork Report</h2>
+    <p style="color:var(--dim);max-width:48ch">News about Inu, delivered whenever he does something. Expect very few emails.</p>
+    <form id="borkForm" novalidate>
+      <label for="email" style="position:absolute;left:-9999px">Email address</label>
+      <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+      <button class="pill" type="submit">Sign up</button>
+    </form>
+    <p class="note inu-says" id="borkNote" role="status"></p>
+    <p class="fine">This sign-up is part of the joke. It is not connected to anything and nothing is sent or stored.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="rating" aria-label="Rated S for Shibe"><b>S</b><span>Shibe 0+</span></div>
+    <div>
+      <ul>
+        <li><a href="#top">Back to the top</a></li>
+        <li><a href="#story">Story</a></li>
+        <li><a href="#walk">The walk</a></li>
+        <li><a href="#rap-sheet">Rap sheet</a></li>
+        <li><a href="#bork-report">Bork Report</a></li>
+      </ul>
+      <p>GTA VI Inu is a fan-made parody. It is not affiliated with, endorsed by or connected to Rockstar Games or Take-Two Interactive, who own Grand Theft Auto and its trademarks. Inu is a fictional dog, and every event, place and police department on this page is made up.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* drawn scenery for the cards without artwork */
+  document.querySelectorAll('.scene').forEach(function(el){
+    var h = '<div class="sc-sun"></div><svg class="sc-far" viewBox="0 0 1200 200" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><use href="#skyline"/></svg>';
+    (el.dataset.palms || '').split(';').filter(Boolean).forEach(function(p){
+      var a = p.split(',');
+      h += '<svg class="sc-palm" style="left:' + a[0] + '%;height:' + a[1] + '%" viewBox="0 0 200 300" aria-hidden="true"><use href="#palm"/></svg>';
+    });
+    (el.dataset.signs || '').split(';').filter(Boolean).forEach(function(s){
+      var a = s.split(',');
+      h += '<span class="sc-sign" style="left:' + a[1] + '%;--c:' + a[2] + '" aria-hidden="true">' + a[0] + '</span>';
+    });
+    el.innerHTML = h + '<div class="sc-ground"></div><div class="grain"></div><div class="sc-vig"></div>';
+  });
+
+  /* loader */
+  var pct = document.getElementById('pct'), msg = document.getElementById('loadmsg'), n = 0;
+  if(!reduce){
+    var t = setInterval(function(){
+      n = Math.min(99, n + 7); pct.textContent = n + '%';
+      if(n >= 99){ clearInterval(t); msg.textContent = 'He did not stand up. Loading anyway'; }
+    }, 80);
+  }
+
+  /* days without a walk */
+  var days = Math.floor((Date.now() - new Date(2024, 0, 1).getTime()) / 86400000);
+  document.getElementById('days').textContent = days.toLocaleString('en-US');
+
+  /* the walk: four scenes, driven by scroll or by the button */
+  var steps = [
+    {cap:'much drift', when:'00:11 after "walkies"', what:'The Human reached for the leash. Inu reached for a convertible that was not his.'},
+    {cap:'very escape', when:'00:19 after "walkies"', what:'Two patrol cars. One scooter. No remorse of any kind.'},
+    {cap:'such speed', when:'00:34 after "walkies"', what:'The road ended at the water. He did not.'},
+    {cap:'wow. mission passed', when:'Sunset', what:'The car is on fire. The drink is cold. The walk never happened.'}
+  ];
+  var walk = document.getElementById('walk'), stage = document.getElementById('stage');
+  var shots = stage.querySelectorAll('.frame img'), ambs = stage.querySelectorAll('.amb'), dots = stage.querySelectorAll('.dots i');
+  var cap = document.getElementById('cap'), when = document.getElementById('when'), what = document.getElementById('what');
+  var effort = document.getElementById('effort'), km = document.getElementById('km'), next = document.getElementById('next');
+  var manual = 0, shown = -1;
+
+  function progress(){
+    var r = walk.getBoundingClientRect();
+    var travel = Math.max(1, walk.offsetHeight - stage.offsetHeight);
+    var scrolled = Math.max(0, Math.min(travel, 64 - r.top));
+    return {travel: travel, scrolled: scrolled, p: Math.max(scrolled / travel, manual)};
+  }
+  function render(){
+    var s = progress(), idx = Math.min(steps.length - 1, Math.floor(s.p * steps.length));
+    if(idx !== shown){
+      shown = idx;
+      for(var i = 0; i < steps.length; i++){
+        shots[i].classList.toggle('on', i === idx);
+        ambs[i].classList.toggle('on', i === idx);
+        dots[i].classList.toggle('on', i <= idx);
+      }
+      cap.textContent = steps[idx].cap;
+      when.textContent = steps[idx].when;
+      what.textContent = steps[idx].what;
+      next.textContent = idx >= steps.length - 1 ? 'Start over' : 'Next scene';
+    }
+    effort.textContent = Math.round(Math.max(s.scrolled, manual * s.travel)).toLocaleString('en-US') + ' px';
+    km.textContent = (Math.min(1, s.p) * 38.4).toFixed(1) + ' km';
+  }
+  var ticking = false;
+  function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(function(){ ticking = false; render(); }); } }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', onScroll);
+  next.addEventListener('click', function(){
+    if(shown >= steps.length - 1){
+      manual = 0;
+      if(progress().p * steps.length >= steps.length - 1){ walk.scrollIntoView({block:'start'}); }
+    } else {
+      manual = (shown + 1) / steps.length + 0.01;
+    }
+    render();
+  });
+  render();
+
+  /* newsletter joke */
+  document.getElementById('borkForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = document.getElementById('email').value.trim(), note = document.getElementById('borkNote');
+    note.textContent = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)
+      ? 'inu has seen your email. he has chosen not to respond. (nothing was sent.)'
+      : 'that is not an email. even inu can tell.';
+  });
+})();
+</script>
+</body>
+</html>
